@@ -2,9 +2,51 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# PAGE TITLE
+# PAGE CONFIG
 
-st.title("Machine Learning Based Buyer Segmentation and Investment Profiling")
+st.set_page_config(
+    page_title="Buyer Segmentation Dashboard",
+    layout="wide"
+)
+
+# CUSTOM CSS
+
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f5f7fa;
+    }
+
+    h1 {
+        color: #1f4e79;
+        text-align: center;
+    }
+
+    h2, h3 {
+        color: #16324f;
+    }
+
+    .stMetric {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+
+    div.stButton > button {
+        border-radius: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# TITLE
+
+st.title("🏡 Real Estate Buyer Segmentation Dashboard")
+
+st.markdown("""
+This dashboard analyzes buyer behavior, investment patterns,
+and customer segmentation using Machine Learning.
+""")
 
 # LOAD DATA
 
@@ -37,7 +79,7 @@ purpose_map = {
     1: "Personal Use"
 }
 
-# CONVERT ENCODED VALUES TO TEXT
+# CONVERT VALUES
 
 df['country_name'] = df['country'].map(country_map)
 
@@ -47,15 +89,9 @@ df['client_type_name'] = df['client_type'].map(client_type_map)
 
 df['purpose_name'] = df['acquisition_purpose'].map(purpose_map)
 
-# DATASET PREVIEW
+# SIDEBAR
 
-st.subheader("Dataset Preview")
-
-st.write(df.head())
-
-# SIDEBAR FILTERS
-
-st.sidebar.header("User Controls / Filters")
+st.sidebar.title("🔍 User Controls")
 
 country = st.sidebar.selectbox(
     "Select Country",
@@ -92,86 +128,115 @@ filtered_data = df[
     (df['Buyer_Segment'] == segment)
 ]
 
-# SHOW FILTERED DATA
+# METRICS
 
-st.subheader("Filtered Buyer Data")
+st.subheader("📊 Dashboard Overview")
 
-st.write(filtered_data)
+col1, col2, col3, col4 = st.columns(4)
 
-# BUYER SEGMENT OVERVIEW
+col1.metric("Total Buyers", len(df))
 
-st.subheader("Buyer Segmentation Overview")
+col2.metric("Average Budget", f"{df['budget'].mean():,.0f}")
 
-fig, ax = plt.subplots()
+col3.metric("Average Satisfaction", f"{df['satisfaction_score'].mean():.1f}")
 
-df['Buyer_Segment'].value_counts().plot(
-    kind='bar',
-    ax=ax
-)
+col4.metric("Total Segments", df['Buyer_Segment'].nunique())
 
-plt.xlabel("Buyer Segment")
-plt.ylabel("Count")
-plt.title("Buyer Segment Distribution")
+# DATA PREVIEW
 
-st.pyplot(fig)
+st.subheader("📁 Filtered Buyer Data")
 
-# INVESTOR BEHAVIOUR DASHBOARD
+st.dataframe(filtered_data)
 
-st.subheader("Investor Behaviour Dashboard")
+# CHARTS ROW 1
 
-fig2, ax2 = plt.subplots()
+col5, col6 = st.columns(2)
 
-ax2.scatter(
-    df['age'],
-    df['budget'],
-    c=df['Cluster']
-)
+with col5:
 
-ax2.set_xlabel("Age")
-ax2.set_ylabel("Budget")
-ax2.set_title("Age vs Budget")
+    st.subheader("📌 Buyer Segment Distribution")
 
-st.pyplot(fig2)
+    fig1, ax1 = plt.subplots(figsize=(6,4))
 
-# SATISFACTION SCORE ANALYSIS
+    df['Buyer_Segment'].value_counts().plot(
+        kind='bar',
+        ax=ax1
+    )
 
-st.subheader("Satisfaction Score Analysis")
+    ax1.set_xlabel("Buyer Segment")
+    ax1.set_ylabel("Count")
 
-fig3, ax3 = plt.subplots()
+    st.pyplot(fig1)
 
-ax3.hist(df['satisfaction_score'])
+with col6:
 
-ax3.set_xlabel("Satisfaction Score")
-ax3.set_ylabel("Count")
-ax3.set_title("Satisfaction Score Distribution")
+    st.subheader("🌍 Geographic Buyer Analysis")
 
-st.pyplot(fig3)
+    fig2, ax2 = plt.subplots(figsize=(6,4))
 
-# GEOGRAPHIC BUYER ANALYSIS
+    df['country_name'].value_counts().plot(
+        kind='bar',
+        ax=ax2
+    )
 
-st.subheader("Geographic Buyer Analysis")
+    ax2.set_xlabel("Country")
+    ax2.set_ylabel("Buyers")
 
-country_counts = df['country_name'].value_counts()
+    st.pyplot(fig2)
 
-fig4, ax4 = plt.subplots()
+# CHARTS ROW 2
 
-country_counts.plot(
-    kind='bar',
-    ax=ax4
-)
+col7, col8 = st.columns(2)
 
-plt.xlabel("Country")
-plt.ylabel("Number of Buyers")
-plt.title("Country Wise Buyer Analysis")
+with col7:
 
-st.pyplot(fig4)
+    st.subheader("💰 Age vs Budget Analysis")
 
-# SEGMENT INSIGHTS PANEL
+    fig3, ax3 = plt.subplots(figsize=(6,4))
 
-st.subheader("Segment Insights Panel")
+    ax3.scatter(
+        df['age'],
+        df['budget'],
+        c=df['Cluster']
+    )
+
+    ax3.set_xlabel("Age")
+    ax3.set_ylabel("Budget")
+
+    st.pyplot(fig3)
+
+with col8:
+
+    st.subheader("⭐ Satisfaction Score Distribution")
+
+    fig4, ax4 = plt.subplots(figsize=(6,4))
+
+    ax4.hist(df['satisfaction_score'])
+
+    ax4.set_xlabel("Satisfaction Score")
+    ax4.set_ylabel("Count")
+
+    st.pyplot(fig4)
+
+# SEGMENT INSIGHTS
+
+st.subheader("🧠 Segment Insights Panel")
 
 cluster_summary = df.groupby(
     'Buyer_Segment'
 ).mean(numeric_only=True)
 
-st.write(cluster_summary)
+st.dataframe(cluster_summary)
+
+# FOOTER
+
+st.markdown("---")
+
+st.markdown("""
+### ✅ Project Features
+- Machine Learning Based Buyer Segmentation
+- Investment Profiling
+- Geographic Buyer Analysis
+- Interactive Dashboard
+- Investor Behaviour Insights
+""")
