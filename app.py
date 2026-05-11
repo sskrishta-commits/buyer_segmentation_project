@@ -38,14 +38,6 @@ div[data-testid="metric-container"] {
     text-align: center;
 }
 
-.sidebar .sidebar-content {
-    background-color: #ffffff;
-}
-
-.stDataFrame {
-    background-color: white;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -55,7 +47,7 @@ st.title("🏡 Real Estate Market Intelligence Dashboard")
 
 st.markdown("""
 ### Machine Learning Based Buyer Segmentation & Investment Profiling
-Analyze buyer behavior, investment patterns, and geographic trends using interactive visualizations.
+Analyze buyer behavior, investment patterns, and geographic trends using Machine Learning.
 """)
 
 # LOAD DATA
@@ -99,12 +91,7 @@ df['client_type_name'] = df['client_type'].map(client_type_map)
 
 df['purpose_name'] = df['acquisition_purpose'].map(purpose_map)
 
-# SIDEBAR
-
-st.sidebar.image(
-    "https://cdn-icons-png.flaticon.com/512/3448/3448610.png",
-    width=120
-)
+# SIDEBAR FILTERS
 
 st.sidebar.title("🔍 Dashboard Filters")
 
@@ -143,7 +130,7 @@ filtered_data = df[
     (df['Buyer_Segment'] == segment)
 ]
 
-# DASHBOARD METRICS
+# METRICS
 
 st.subheader("📊 Key Market Metrics")
 
@@ -169,9 +156,9 @@ col4.metric(
     df['Buyer_Segment'].nunique()
 )
 
-# FILTERED DATA TABLE
+# FILTERED DATA
 
-st.subheader("📁 Buyer Data")
+st.subheader("📁 Filtered Buyer Data")
 
 st.dataframe(
     filtered_data,
@@ -184,17 +171,17 @@ col5, col6 = st.columns(2)
 
 with col5:
 
-    st.subheader("📌 Buyer Segment Distribution")
+    st.subheader("🥧 Buyer Segment Pie Chart")
 
-    fig1, ax1 = plt.subplots(figsize=(7,4))
+    fig1, ax1 = plt.subplots(figsize=(6,6))
 
     df['Buyer_Segment'].value_counts().plot(
-        kind='bar',
+        kind='pie',
+        autopct='%1.1f%%',
         ax=ax1
     )
 
-    ax1.set_xlabel("Buyer Segment")
-    ax1.set_ylabel("Count")
+    ax1.set_ylabel("")
 
     st.pyplot(fig1)
 
@@ -224,7 +211,7 @@ with col7:
 
     fig3, ax3 = plt.subplots(figsize=(7,4))
 
-    scatter = ax3.scatter(
+    ax3.scatter(
         df['age'],
         df['budget'],
         c=df['Cluster']
@@ -248,6 +235,34 @@ with col8:
 
     st.pyplot(fig4)
 
+# HEATMAP SECTION
+
+st.subheader("🔥 Correlation Heatmap")
+
+numeric_df = df.select_dtypes(include=['number'])
+
+correlation = numeric_df.corr()
+
+fig5, ax5 = plt.subplots(figsize=(10,6))
+
+heatmap = ax5.imshow(correlation)
+
+ax5.set_xticks(range(len(correlation.columns)))
+ax5.set_yticks(range(len(correlation.columns)))
+
+ax5.set_xticklabels(
+    correlation.columns,
+    rotation=90
+)
+
+ax5.set_yticklabels(
+    correlation.columns
+)
+
+plt.colorbar(heatmap)
+
+st.pyplot(fig5)
+
 # SEGMENT INSIGHTS
 
 st.subheader("🧠 Segment Insights Panel")
@@ -261,6 +276,22 @@ st.dataframe(
     use_container_width=True
 )
 
+# PIE CHART FOR CLIENT TYPES
+
+st.subheader("👥 Client Type Distribution")
+
+fig6, ax6 = plt.subplots(figsize=(6,6))
+
+df['client_type_name'].value_counts().plot(
+    kind='pie',
+    autopct='%1.1f%%',
+    ax=ax6
+)
+
+ax6.set_ylabel("")
+
+st.pyplot(fig6)
+
 # FOOTER
 
 st.markdown("---")
@@ -270,11 +301,12 @@ st.markdown("""
 
 - Machine Learning Based Buyer Segmentation  
 - Investment Profiling Analytics  
+- Interactive Pie Charts  
+- Correlation Heatmap  
 - Geographic Buyer Insights  
+- Investor Behaviour Analysis  
+- Segment Wise Statistics  
 - Interactive User Filters  
-- Investor Behaviour Dashboard  
-- Segment Wise Analysis  
-- Real Estate Market Intelligence  
 
 ---
 Developed using **Python, Streamlit, Pandas, Matplotlib, and Scikit-Learn**
