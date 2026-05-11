@@ -2,50 +2,60 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# PAGE CONFIG
+# PAGE CONFIGURATION
 
 st.set_page_config(
-    page_title="Buyer Segmentation Dashboard",
+    page_title="Real Estate Market Intelligence Dashboard",
+    page_icon="🏡",
     layout="wide"
 )
 
 # CUSTOM CSS
 
 st.markdown("""
-    <style>
-    .main {
-        background-color: #f5f7fa;
-    }
+<style>
 
-    h1 {
-        color: #1f4e79;
-        text-align: center;
-    }
+.main {
+    background-color: #f4f6f9;
+}
 
-    h2, h3 {
-        color: #16324f;
-    }
+h1 {
+    color: #0b1f3a;
+    text-align: center;
+    font-size: 42px;
+    font-weight: bold;
+}
 
-    .stMetric {
-        background-color: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-    }
+h2, h3 {
+    color: #16324f;
+}
 
-    div.stButton > button {
-        border-radius: 10px;
-    }
-    </style>
+div[data-testid="metric-container"] {
+    background-color: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.sidebar .sidebar-content {
+    background-color: #ffffff;
+}
+
+.stDataFrame {
+    background-color: white;
+}
+
+</style>
 """, unsafe_allow_html=True)
 
 # TITLE
 
-st.title("🏡 Real Estate Buyer Segmentation Dashboard")
+st.title("🏡 Real Estate Market Intelligence Dashboard")
 
 st.markdown("""
-This dashboard analyzes buyer behavior, investment patterns,
-and customer segmentation using Machine Learning.
+### Machine Learning Based Buyer Segmentation & Investment Profiling
+Analyze buyer behavior, investment patterns, and geographic trends using interactive visualizations.
 """)
 
 # LOAD DATA
@@ -79,7 +89,7 @@ purpose_map = {
     1: "Personal Use"
 }
 
-# CONVERT VALUES
+# MAP VALUES
 
 df['country_name'] = df['country'].map(country_map)
 
@@ -91,7 +101,12 @@ df['purpose_name'] = df['acquisition_purpose'].map(purpose_map)
 
 # SIDEBAR
 
-st.sidebar.title("🔍 User Controls")
+st.sidebar.image(
+    "https://cdn-icons-png.flaticon.com/512/3448/3448610.png",
+    width=120
+)
+
+st.sidebar.title("🔍 Dashboard Filters")
 
 country = st.sidebar.selectbox(
     "Select Country",
@@ -128,27 +143,42 @@ filtered_data = df[
     (df['Buyer_Segment'] == segment)
 ]
 
-# METRICS
+# DASHBOARD METRICS
 
-st.subheader("📊 Dashboard Overview")
+st.subheader("📊 Key Market Metrics")
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Total Buyers", len(df))
+col1.metric(
+    "Total Buyers",
+    len(df)
+)
 
-col2.metric("Average Budget", f"{df['budget'].mean():,.0f}")
+col2.metric(
+    "Average Budget",
+    f"${df['budget'].mean():,.0f}"
+)
 
-col3.metric("Average Satisfaction", f"{df['satisfaction_score'].mean():.1f}")
+col3.metric(
+    "Average Satisfaction",
+    f"{df['satisfaction_score'].mean():.1f}"
+)
 
-col4.metric("Total Segments", df['Buyer_Segment'].nunique())
+col4.metric(
+    "Buyer Segments",
+    df['Buyer_Segment'].nunique()
+)
 
-# DATA PREVIEW
+# FILTERED DATA TABLE
 
-st.subheader("📁 Filtered Buyer Data")
+st.subheader("📁 Buyer Data")
 
-st.dataframe(filtered_data)
+st.dataframe(
+    filtered_data,
+    use_container_width=True
+)
 
-# CHARTS ROW 1
+# FIRST ROW OF CHARTS
 
 col5, col6 = st.columns(2)
 
@@ -156,7 +186,7 @@ with col5:
 
     st.subheader("📌 Buyer Segment Distribution")
 
-    fig1, ax1 = plt.subplots(figsize=(6,4))
+    fig1, ax1 = plt.subplots(figsize=(7,4))
 
     df['Buyer_Segment'].value_counts().plot(
         kind='bar',
@@ -172,7 +202,7 @@ with col6:
 
     st.subheader("🌍 Geographic Buyer Analysis")
 
-    fig2, ax2 = plt.subplots(figsize=(6,4))
+    fig2, ax2 = plt.subplots(figsize=(7,4))
 
     df['country_name'].value_counts().plot(
         kind='bar',
@@ -180,21 +210,21 @@ with col6:
     )
 
     ax2.set_xlabel("Country")
-    ax2.set_ylabel("Buyers")
+    ax2.set_ylabel("Number of Buyers")
 
     st.pyplot(fig2)
 
-# CHARTS ROW 2
+# SECOND ROW OF CHARTS
 
 col7, col8 = st.columns(2)
 
 with col7:
 
-    st.subheader("💰 Age vs Budget Analysis")
+    st.subheader("💰 Investor Behaviour Analysis")
 
-    fig3, ax3 = plt.subplots(figsize=(6,4))
+    fig3, ax3 = plt.subplots(figsize=(7,4))
 
-    ax3.scatter(
+    scatter = ax3.scatter(
         df['age'],
         df['budget'],
         c=df['Cluster']
@@ -209,7 +239,7 @@ with col8:
 
     st.subheader("⭐ Satisfaction Score Distribution")
 
-    fig4, ax4 = plt.subplots(figsize=(6,4))
+    fig4, ax4 = plt.subplots(figsize=(7,4))
 
     ax4.hist(df['satisfaction_score'])
 
@@ -226,17 +256,26 @@ cluster_summary = df.groupby(
     'Buyer_Segment'
 ).mean(numeric_only=True)
 
-st.dataframe(cluster_summary)
+st.dataframe(
+    cluster_summary,
+    use_container_width=True
+)
 
 # FOOTER
 
 st.markdown("---")
 
 st.markdown("""
-### ✅ Project Features
-- Machine Learning Based Buyer Segmentation
-- Investment Profiling
-- Geographic Buyer Analysis
-- Interactive Dashboard
-- Investor Behaviour Insights
+### ✅ Dashboard Features
+
+- Machine Learning Based Buyer Segmentation  
+- Investment Profiling Analytics  
+- Geographic Buyer Insights  
+- Interactive User Filters  
+- Investor Behaviour Dashboard  
+- Segment Wise Analysis  
+- Real Estate Market Intelligence  
+
+---
+Developed using **Python, Streamlit, Pandas, Matplotlib, and Scikit-Learn**
 """)
