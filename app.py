@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# PAGE CONFIGURATION
+# PAGE CONFIG
 
 st.set_page_config(
     page_title="Real Estate Market Intelligence Dashboard",
@@ -32,10 +32,18 @@ h2, h3 {
 
 div[data-testid="metric-container"] {
     background-color: white;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 18px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
     text-align: center;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #ffffff;
+}
+
+footer {
+    visibility: hidden;
 }
 
 </style>
@@ -46,8 +54,11 @@ div[data-testid="metric-container"] {
 st.title("🏡 Real Estate Market Intelligence Dashboard")
 
 st.markdown("""
-### Machine Learning Based Buyer Segmentation & Investment Profiling
-Analyze buyer behavior, investment patterns, and geographic trends using Machine Learning.
+### Machine Learning Based Buyer Segmentation and Investment Profiling
+
+This dashboard uses **Machine Learning (KMeans Clustering)** to analyze  
+buyer behavior, investment trends, geographic patterns, and customer segmentation  
+within the real estate market.
 """)
 
 # LOAD DATA
@@ -91,7 +102,7 @@ df['client_type_name'] = df['client_type'].map(client_type_map)
 
 df['purpose_name'] = df['acquisition_purpose'].map(purpose_map)
 
-# SIDEBAR FILTERS
+# SIDEBAR
 
 st.sidebar.title("🔍 Dashboard Filters")
 
@@ -130,7 +141,7 @@ filtered_data = df[
     (df['Buyer_Segment'] == segment)
 ]
 
-# METRICS
+# METRICS SECTION
 
 st.subheader("📊 Key Market Metrics")
 
@@ -156,7 +167,7 @@ col4.metric(
     df['Buyer_Segment'].nunique()
 )
 
-# FILTERED DATA
+# DATA PREVIEW
 
 st.subheader("📁 Filtered Buyer Data")
 
@@ -165,13 +176,13 @@ st.dataframe(
     use_container_width=True
 )
 
-# FIRST ROW OF CHARTS
+# FIRST ROW
 
 col5, col6 = st.columns(2)
 
 with col5:
 
-    st.subheader("🥧 Buyer Segment Pie Chart")
+    st.subheader("🥧 Buyer Segment Distribution")
 
     fig1, ax1 = plt.subplots(figsize=(6,6))
 
@@ -201,7 +212,7 @@ with col6:
 
     st.pyplot(fig2)
 
-# SECOND ROW OF CHARTS
+# SECOND ROW
 
 col7, col8 = st.columns(2)
 
@@ -235,7 +246,7 @@ with col8:
 
     st.pyplot(fig4)
 
-# HEATMAP SECTION
+# HEATMAP
 
 st.subheader("🔥 Correlation Heatmap")
 
@@ -263,20 +274,7 @@ plt.colorbar(heatmap)
 
 st.pyplot(fig5)
 
-# SEGMENT INSIGHTS
-
-st.subheader("🧠 Segment Insights Panel")
-
-cluster_summary = df.groupby(
-    'Buyer_Segment'
-).mean(numeric_only=True)
-
-st.dataframe(
-    cluster_summary,
-    use_container_width=True
-)
-
-# PIE CHART FOR CLIENT TYPES
+# CLIENT TYPE PIE CHART
 
 st.subheader("👥 Client Type Distribution")
 
@@ -292,22 +290,52 @@ ax6.set_ylabel("")
 
 st.pyplot(fig6)
 
+# SEGMENT INSIGHTS PANEL
+
+st.subheader("🧠 Segment Insights Panel")
+
+cluster_summary = df.groupby(
+    'Buyer_Segment'
+).mean(numeric_only=True)
+
+st.dataframe(
+    cluster_summary,
+    use_container_width=True
+)
+
+# PROJECT INSIGHTS
+
+st.subheader("📌 Key Business Insights")
+
+st.markdown("""
+- Luxury Investors generally show higher budgets and investment capacity.
+- First-Time Buyers prefer lower budget properties with shorter investment horizons.
+- Corporate Buyers contribute significantly to premium property investments.
+- Geographic analysis helps identify region-wise investment demand.
+- Satisfaction analysis helps improve customer targeting and marketing strategy.
+""")
+
+# TECHNOLOGIES USED
+
+st.subheader("⚙️ Technologies Used")
+
+st.markdown("""
+- Python  
+- Pandas  
+- NumPy  
+- Matplotlib  
+- Scikit-Learn  
+- Streamlit  
+- KMeans Clustering  
+""")
+
 # FOOTER
 
 st.markdown("---")
 
 st.markdown("""
-### ✅ Dashboard Features
+### 👨‍💻 Academic Project Submission
 
-- Machine Learning Based Buyer Segmentation  
-- Investment Profiling Analytics  
-- Interactive Pie Charts  
-- Correlation Heatmap  
-- Geographic Buyer Insights  
-- Investor Behaviour Analysis  
-- Segment Wise Statistics  
-- Interactive User Filters  
-
----
-Developed using **Python, Streamlit, Pandas, Matplotlib, and Scikit-Learn**
+Machine Learning Based Buyer Segmentation and Investment Profiling  
+for Real Estate Market Intelligence
 """)
